@@ -1,0 +1,7 @@
+pandas
+requests
+trafilatura
+tqdm
+openpyxl
+# optional, only for --pdf:
+# playwright
