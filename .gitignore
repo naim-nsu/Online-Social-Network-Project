@@ -1,0 +1,12 @@
+# Full article texts stay on the team's computers, never in this repo
+**/03_articles.csv
+**/batches/
+**/*.jsonl
+**/05_relevant_articles.csv
+**/05_relevance_sample.xlsx
+**/pdf/
+# Secrets and local files
+.env
+*.key
+__pycache__/
+.venv/
