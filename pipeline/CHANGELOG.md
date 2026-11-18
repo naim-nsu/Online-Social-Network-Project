@@ -11,3 +11,6 @@ There is only one script. Each version keeps all earlier steps (`dedupe`, `check
 | 2026-11-02 | New step `report`: outlet coverage table `04_outlet_coverage.csv` | report |
 | 2026-11-02 | Download step retries articles that failed temporarily (rate limit, timeout, error) on the next run, and keeps only the latest attempt per article | download |
 | 2026-11-03 | New step `relevance`: keeps 1 Jun to 26 Oct, scores each full text for pause-debate terms, makes a 100-article Excel sheet to label, then picks the cutoff with the best F1 and writes `05_relevant_articles.csv` | relevance |
+| 2026-11-12 | `relevance` keeps only the ±7-day windows around the five events (1,083 texts) and tags `event_windows` / `nearest_event`; writes `05_relevance_scores.csv` | relevance |
+| 2026-11-17 | New script `llm_relevance.py`: Claude labels relevance with the agreed rule; `validate` on the 100 gold labels, `run` on all window texts, cached per model | llm_relevance |
+| 2026-11-18 | First real run: Haiku failed validation, Sonnet passed (kappa 0.69, recall 0.96); 907 of 1,083 relevant | llm_relevance |

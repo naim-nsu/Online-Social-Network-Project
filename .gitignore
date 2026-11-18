@@ -6,6 +6,7 @@
 **/06_relevant_articles.csv
 **/05_relevance_sample.xlsx
 **/05_relevance_labels/
+**/coding_*.xlsx
 **/pdf/
 # Secrets and local files
 .env

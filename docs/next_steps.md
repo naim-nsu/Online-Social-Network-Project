@@ -1,4 +1,4 @@
-# Team 6: step-by-step to-do list (updated 18.11.2026)
+# Team 6: step-by-step to-do list (updated 19.11.2026)
 
 Scope: ±7 days around the five events (5 Jun, 21 Jul, 18 Aug, 3 Sep, 13 Sep 2026), 1,083 full texts. Paywalled articles excluded.
 
@@ -12,10 +12,10 @@ Scope: ±7 days around the five events (5 Jun, 21 Jul, 18 Aug, 3 Sep, 13 Sep 202
 - ✅ LLM provider: Anthropic; `llm_relevance.py` written
 
 ## Thu 19.11 – status meeting 3
-1. ✅ LLM relevance filter done 18.11 with Sonnet (kappa 0.69, recall 0.96): 907 of 1,083 relevant. Was: run `python llm_relevance.py validate --model haiku --out ../data`. Accept if kappa ≥ 0.6 and recall ≥ 0.9, else try `--model sonnet`. Then `run` with the same model.
-2. 🤖 Codebook draft v1 (actor, actor type, stance, argument categories, examples).
+1. ✅ LLM relevance filter done 18.11 with Sonnet 5.5 (kappa 0.69, recall 0.96; Haiku failed with kappa 0.54): 907 of 1,083 articles relevant → `06_relevant_articles.csv`.
+2. ✅ Codebook v1 (`docs/codebook_v1.md`): actor, actor_org, actor type, stance (pro / anti / neutral), argument A1–A10.
 3. ✅ 3 Sep / 13 Sep overlap: one September episode with three periods (pre 27 Aug–2 Sep / between 3–12 Sep / post 13–19 Sep); overlap-free test as robustness check (decided 18.11).
-4. 🧑 Slides: relevance check (kappa → resolved → rule), keyword filter fails, LLM filter + validation numbers, codebook draft, timeline below.
+4. ✅ Slides for status meeting 3 (relevance check, LLM filter, September design, codebook v1, timeline).
 
 ## By 26.11 – pilot week
 5. 🧑 Two coders code the same 10 articles with codebook v1. 🤖 Agreement script, 🧑 fix unclear rules → codebook v2.

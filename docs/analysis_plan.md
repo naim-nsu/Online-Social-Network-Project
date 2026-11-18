@@ -1,7 +1,14 @@
-# Team 6 analysis plan (v3, 2026-11-03)
+# Team 6 analysis plan (v3.1, updated 2026-11-19)
 
 _Who says what, about which themes, and who leads the debate? News media in the AI pause debate, compared with Bluesky and Hacker News (the other two teams)._
 
+
+**Update v3.1 (12–19 Nov):**
+
+- **Text analyses use only the ±7-day windows** around the five events (event day counts as "after"; decided 12.11): 1,083 full texts.
+- **Relevance filter done (18.11):** the keyword cutoff kept everything, so relevance is decided by an LLM (Anthropic, Claude Sonnet 5.5), validated on 100 double-coded gold labels (kappa 0.69, recall 0.96). **907 of 1,083 articles are relevant.** Details: `pipeline/relevance_check.md`.
+- **3 and 13 Sep form one September episode with three periods** (decided 18.11), see 3.4.
+- **Codebook v1** (18.11): `docs/codebook_v1.md`. Stance is pro / anti / neutral; one argument per statement (A1–A10).
 
 **Scope decisions (v3, 3 Nov):**
 
@@ -62,21 +69,20 @@ The old H3 ("coverage rises after events") is no longer a hypothesis. It stays a
 
 ### 3.1 Corpus preparation
 
-- **Restrict to 1 Jun to 26 Oct.** That leaves roughly 1,900 full texts. The exact number follows once the relevance step runs.
-- A **relevance filter** on those full texts: keyword score plus 100 hand-coded articles to fix the threshold, with F1 ≥ 0.85.
+- **Restrict to the ±7-day event windows** (5 Jun, 21 Jul, 18 Aug, 3 Sep, 13 Sep): 1,083 full texts.
+- **Relevance filter:** 100 articles double-coded (Cohen's kappa 0.58, disagreements resolved, gold = 81/100 relevant). A keyword cutoff did not work (best F1 at "keep all"), so an LLM labels relevance with the agreed rule; accepted at kappa ≥ 0.6 and recall ≥ 0.9 on the gold labels. Result: Claude Sonnet 5.5, kappa 0.69, recall 0.96 → **907 relevant articles**.
 - Text-level near-duplicate removal, for reprints with different titles.
 
 ### 3.2 Statements: who says what (RQ1, RQ2)
 
-- **Codebook.** The unit is one statement (actor plus position or argument). Variables:
-  - actor
-  - actor type: industry / academia / civil society / government & politics / international organisation / other
-  - country
-  - stance: pro-pause / anti-pause / conditional / neutral
-  - argument category
-- **Gold standard.** About 120 articles (about 300 statements), double-coded. Target Krippendorff's α ≥ 0.67 per variable, ideally ≥ 0.80.
+- **Codebook v1** (`docs/codebook_v1.md`). The unit is one statement (one actor + one stance + one argument per article). Variables:
+  - actor, actor_org
+  - actor type: industry / academia / civil society / government & politics / international organisation / media & other
+  - stance: pro / anti / neutral (a pause supported under a condition counts as pro; "not unless rivals stop too" counts as anti)
+  - argument: one of ten categories (A1–A10), each mapped to a BERTopic theme
+- **Gold standard.** About 80–120 articles, double-coded by all four members in two pairs. Target Krippendorff's α ≥ 0.67 per variable, ideally ≥ 0.80.
 - **Automated extraction** on the remaining relevant articles:
-  - Recommended: LLM-assisted extraction to JSON, validated against the gold standard with F1 and accuracy per variable.
+  - LLM-assisted extraction to JSON with the Anthropic API (Claude Haiku / Sonnet 5.5), validated against the gold standard with F1 and accuracy per variable.
   - Fallback without an LLM: spaCy NER and quote rules for the actor, plus a small classifier for stance. (Not needed: the team confirmed LLM API access on 2026-11-03.)
 - Normalise actor names with an alias table.
 
@@ -105,11 +111,14 @@ The old H3 ("coverage rises after events") is no longer a hypothesis. It stays a
 | Status meeting | Goal by then |
 |---|---|
 | **Thu 05.11** | Present the query log, key events, coverage table and this plan. Agree on the shared format with the other teams |
-| **Thu 19.11** | Relevance filter done. Codebook piloted. Daily news CSV (relevant articles) ready |
-| **Thu 03.12** | Double coding and α done. First BERTopic run. Decide whether the joint lead/lag part goes ahead |
+| **Thu 19.11** | Relevance filter done and validated (907 relevant). Codebook v1 |
+| **26.11 (team, no meeting)** | Codebook pilot on 10 articles → v2. First BERTopic run. Daily news CSV for the other teams |
+| **Thu 03.12** | Double coding and α done, gold standard. BERTopic topics labelled. Go / no-go for the joint lead/lag part |
 | **Thu 17.12** | Automated extraction validated. Topics labelled |
-| **Thu 07.01** | H1, H2, H3, H4 and H5 results. Draft paper |
-| **Thu 28.01.2027** | Final presentation (15 to 20 slides, 10 to 12 min) and paper (10 to 20 pages plus code) |
+| **Christmas break** | Write Introduction, Related work, Hypotheses, Method |
+| **Thu 07.01** | H1–H3 results, first H4 / H5 numbers |
+| **Thu 28.01.2027** | Final presentation (15 to 20 slides, 10 to 12 min) |
+| **Fri 12.02.2027** | Paper (10 to 20 pages plus code); exact deadline to confirm with the instructors |
 
 **Paper structure required by the seminar:** Introduction, Related work, Hypotheses, Method, Results, Discussion, Weaknesses & future work.
 
@@ -119,7 +128,7 @@ The old H3 ("coverage rises after events") is no longer a hypothesis. It stays a
 
 ### 5.1 Practical
 
-1. ~~Do we have LLM API access with a small budget?~~ Resolved 2026-11-03: yes, so 3.2 uses LLM-assisted extraction.
+1. ~~Do we have LLM API access with a small budget?~~ Resolved 2026-11-03: yes, so 3.2 uses LLM-assisted extraction. Provider: Anthropic (decided 17.11).
 2. Have the other teams agreed to the shared CSV format and the dictionaries?
 3. Can Bluesky (search API, `since`/`until`) and Hacker News (Algolia API) cover 1 Jun to 26 Oct with timestamps and URLs?
 4. **Overlap:** Project C originally covered Hacker News *and* Bluesky. Do both other teams now work on Bluesky? If so, they should agree on who does what: for example the Hacker News team keeps sentiment on HN, and the new Bluesky team does tribes and networks on Bluesky. Otherwise one platform would be analysed twice and the comparison would have only two sources.
