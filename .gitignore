@@ -3,10 +3,17 @@
 **/batches/
 **/*.jsonl
 **/05_relevant_articles.csv
+**/06_relevant_articles.csv
 **/05_relevance_sample.xlsx
+**/05_relevance_labels/
+**/coding_*.xlsx
 **/pdf/
 # Secrets and local files
 .env
 *.key
 __pycache__/
 .venv/
+.DS_Store
+# Team-internal context (names, contacts, internal links), keep local
+PROJECT_CONTEXT.md
+CLAUDE.md
