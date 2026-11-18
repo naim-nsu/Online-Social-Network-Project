@@ -89,9 +89,10 @@ The old H3 ("coverage rises after events") is no longer a hypothesis. It stays a
 
 ### 3.4 Tests
 
-- **H3 (events shift themes):** compare theme shares in the 14 days before and after each event, with a chi-square test or a proportion test per theme. Add one interrupted time-series model per event as a robustness check.
-  - The window starts on 1 Jun, so **5 Jun has no "before" period**. It serves as the opening event, and H3 is tested on 21 Jul, 18 Aug, 3 Sep and 13 Sep.
-  - 18 Aug falls inside the Hugging Face aftermath, so use 7-day windows for it and report the overlap.
+- **H3 (events shift themes):** compare theme shares in the 7 days before and the 7 days after each event (event day counts as "after"; decided 12.11.2026), with a chi-square test or a proportion test per theme. Add one interrupted time-series model per event as a robustness check.
+  - **3 Sep and 13 Sep are treated as one September episode with three periods** (team decision, 18.11.2026), because their ±7-day windows overlap on 6–10 Sep (87 articles, 81 relevant): **pre** = 27 Aug–2 Sep, **between** = 3–12 Sep, **post** = 13–19 Sep. Each article belongs to exactly one period, so nothing is counted twice. 3 Sep is tested as pre vs between, 13 Sep as between vs post. The between period is 10 days, so we compare theme **shares**, not counts.
+  - Robustness check: repeat the 3 Sep and 13 Sep tests with the overlap days 6–10 Sep left out (pre 27 Aug–2 Sep vs 3–5 Sep; 11–12 Sep vs 13–19 Sep). If the direction of the results holds, report it as confirmation.
+  - 5 Jun and 21 Jul have very thin "before" sides after the relevance filter (3 and 8 relevant articles), so their before/after tests are reported descriptively only. The full tests rely on 18 Aug, 3 Sep and 13 Sep. 18 Aug does not overlap with the 21 Jul window.
 - **H4 (talking past each other):** compare the theme distribution of pro-pause and anti-pause statements with Jensen-Shannon divergence, against a permutation baseline of 1,000 shuffles of the stance labels. Add a figure of theme shares by stance.
 - **H5 (coalitions):** build an actor network in which two actors are linked when they share stance and argument or theme. Run Louvain community detection and report the share of communities that mix actor types. Show an actor–theme two-mode network for the paper figure.
 - **RQ1:** degree and betweenness centrality in the actor network, plus the top actors per stance.

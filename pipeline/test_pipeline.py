@@ -91,3 +91,12 @@ def test_relevance_score_and_cutoff():
     scores = pd.Series([0, 0, 1, 3, 5, 8]); labels = pd.Series([False, False, False, True, True, True])
     cut, table = best_cutoff(scores, labels)
     assert cut in (2, 3) and table["f1"].max() == 1.0
+
+
+def test_event_windows():
+    import pandas as pd
+    from pipeline import event_windows
+    r = event_windows(pd.Series(["2026-07-14", "2026-07-21", "2026-07-28", "2026-07-29", "2026-09-08", "2026-05-29"]))
+    assert r["event_windows"].tolist() == ["2026-07-21:before", "2026-07-21:after", "2026-07-21:after", "",
+                                           "2026-09-03:after;2026-09-13:before", "2026-06-05:before"]
+    assert r["nearest_event"].tolist()[4] == "2026-09-03"

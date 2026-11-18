@@ -37,8 +37,22 @@ links that only failed temporarily (timeout, error, 429) are checked again.
 | `paywalled_for_library.csv` | Links to look up with the university account (paywalled, teaser only, blocked, broken), with title, outlet and date |
 | `04_outlet_coverage.csv` | From `python pipeline.py report`: per outlet, how many articles came as full text, paywalled, robots-blocked, broken, plus coverage % |
 | `05_relevance_sample.xlsx` | From `python pipeline.py relevance` (1st run): 100 articles to label 1/0 in the `relevant` column |
-| `05_relevant_articles.csv` | From `python pipeline.py relevance` (2nd run, after labelling): only relevant articles, 1 Jun to 26 Oct. This is the corpus for coding and BERTopic |
+| `05_relevant_articles.csv` | From `python pipeline.py relevance` (2nd run, after labelling): only relevant articles within 7 days before/after the five key events (columns `event_windows`, `nearest_event`). This is the corpus for coding and BERTopic |
+| `06_llm_validation.csv` | From `python llm_relevance.py validate`: Claude's label vs the 100 gold labels |
+| `06_llm_relevance.csv` / `06_relevant_articles.csv` | From `python llm_relevance.py run`: LLM label + reason for all 1,083 window texts / full rows of the relevant ones (team-only) |
 | `pdfs/` | Only with `--pdf` |
+
+## LLM relevance filter (after the relevance step)
+The keyword cutoff keeps everything (see `relevance_check.md`), so relevance is decided by Claude:
+```
+pip install anthropic
+set ANTHROPIC_API_KEY=sk-ant-...      # macOS/Linux: export ANTHROPIC_API_KEY=...
+python llm_relevance.py validate --model haiku   # 100 gold articles, prints F1 / kappa (a few cents)
+python llm_relevance.py run --model haiku        # all 1,083 articles, only if validate looks good
+```
+If Haiku scores kappa below 0.6 or recall below 0.9, try `--model sonnet`, then `--model opus` (about $3-4 / $7-8 for the full run).
+```
+```
 
 ## Rules built in
 - robots.txt is respected; disallowed links are not fetched.

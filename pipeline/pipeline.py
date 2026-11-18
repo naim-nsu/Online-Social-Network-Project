@@ -6,7 +6,7 @@ Steps (run one at a time or all together):
     python pipeline.py check
     python pipeline.py download [--max-batches N] [--pdf]
     python pipeline.py report   (articles per outlet: full text vs paywalled)
-    python pipeline.py relevance (run twice: 1. make sample sheet, 2. after labelling, apply cutoff)
+    python pipeline.py relevance (event windows only, +-7 days; run twice: 1. make sample sheet, 2. after labelling, apply cutoff)
     python pipeline.py all      --input <content.csv or content.zip>
 
 All outputs go to --out (default: ./output). Every step can be stopped and
@@ -554,6 +554,28 @@ def run_report(out: Path) -> None:
 # --------------------------------------------------------------------------
 WINDOW_START, WINDOW_END = "2026-06-01", "2026-10-26"
 SAMPLE_SIZE = 100
+# Analysis compares 7 days before vs 7 days after each key event (event day = day 0, "after").
+EVENTS = {"2026-06-05": "Anthropic pause mechanism", "2026-07-21": "Hugging Face incident",
+          "2026-08-18": "OpenAI training pause", "2026-09-03": "Ban ASI Act",
+          "2026-09-13": "Pacing the Frontier call"}
+EVENT_DAYS = 7
+
+
+def event_windows(dates: pd.Series) -> pd.DataFrame:
+    """For each date: every event window it falls in, as 'YYYY-MM-DD:before|after'
+    (a date can be in two windows, e.g. 6-10 Sep), plus the nearest event."""
+    d = pd.to_datetime(dates.str.slice(0, 10), errors="coerce")
+    tags, nearest = [], []
+    for day in d:
+        hits, best = [], None
+        for ev in EVENTS:
+            diff = (day - pd.Timestamp(ev)).days if pd.notna(day) else None
+            if diff is not None and -EVENT_DAYS <= diff <= EVENT_DAYS:
+                hits.append(f"{ev}:{'before' if diff < 0 else 'after'}")
+                if best is None or abs(diff) < best[0]:
+                    best = (abs(diff), ev)
+        tags.append(";".join(hits)); nearest.append(best[1] if best else "")
+    return pd.DataFrame({"event_windows": tags, "nearest_event": nearest}, index=dates.index)
 
 # Terms that signal the pause / slowdown debate itself (case-insensitive)
 RELEVANCE_TERMS = re.compile(
@@ -592,11 +614,14 @@ def best_cutoff(scores: pd.Series, labels: pd.Series) -> tuple[int, pd.DataFrame
 
 def run_relevance(out: Path) -> None:
     arts = pd.read_csv(out / ARTICLES, dtype=str).fillna("")
-    arts = arts[(arts["publish_date"] >= WINDOW_START) & (arts["publish_date"] <= WINDOW_END)].copy()
+    arts = arts.join(event_windows(arts["publish_date"]))
+    arts = arts[arts["event_windows"] != ""].copy()
     arts["relevance_score"] = [relevance_score(t, x) for t, x in zip(arts["title"], arts["text"])]
-    arts[["id", "publish_date", "media_name", "title", "relevance_score"]].to_csv(
-        out / RELEVANCE_SCORES, index=False)
-    print(f"[relevance] {len(arts)} full texts between {WINDOW_START} and {WINDOW_END}")
+    arts[["id", "publish_date", "media_name", "title", "event_windows", "nearest_event",
+          "relevance_score"]].to_csv(out / RELEVANCE_SCORES, index=False)
+    print(f"[relevance] {len(arts)} full texts within {EVENT_DAYS} days before/after the key events")
+    for ev, name in EVENTS.items():
+        print(f"            {ev} {name}: {arts['event_windows'].str.contains(ev).sum()}")
     print("            score distribution: "
           + ", ".join(f"{k}: {v}" for k, v in
                       pd.cut(arts["relevance_score"], [-1, 0, 2, 5, 10, 10**6],
